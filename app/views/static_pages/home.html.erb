@@ -1,3 +1,67 @@
 <% provide(:title, 'Home') %>
-<h1>Supercompumundohipermegared</h1>
-<p>Hola</p>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+	<script src="http://servicios.usig.buenosaires.gob.ar/usig-js/2.3/usig.MapaInteractivo.min.js" type="text/javascript"></script>
+	<script src="http://servicios.usig.buenosaires.gob.ar/usig-js/2.3/usig.AutoCompleterFull.min.js" type="text/javascript"></script>
+        <script type="text/javascript">
+	$.noConflict();
+	jQuery(document).ready(function($) {
+
+		var selectedOption = null;
+
+		var ac = new usig.AutoCompleter('b', {
+       		onReady: function() {
+       			$('#b').val('').removeAttr('disabled').focus();
+       		},
+       		/* Si se quiere que al buscar una direccion ponga un marker en el
+       		mapa descomentar este codigo
+       		******************************************************************
+       		afterSelection: function(option) {
+       			if (option instanceof usig.Direccion || option instanceof usig.inventario.Objeto) {
+       				selectedOption = option;
+       			}
+       		},*/
+       		afterGeoCoding: function(pt) {
+    			if (pt instanceof usig.Punto) {
+    	       		/* Si se quiere que al buscar una direccion ponga un marker en el
+    	       		mapa descomentar este codigo
+    	       		******************************************************************
+    				if (selectedOption instanceof usig.Direccion) {
+    					selectedOption.setCoordenadas(pt);
+    				}
+    				mapa.addMarker(selectedOption, true);
+    				*/
+    				mapa.goTo(pt, true);
+    			}
+       		}
+       	});
+
+		$('#mainForm').bind("submit", function () {
+			return false;
+		});
+
+		$('#mapa').css('width', 600).css('height', 450);
+
+		var mapa = new usig.MapaInteractivo('mapa', {
+			onReady: function() {
+				// Aca se puede poner codigo que se ejecuta cuando cargo el mapa
+			},
+			baseLayer: 'mapabsas_red_de_ciclovias',
+			includeToolbar: false
+		});
+
+
+	});
+	</script>
+<%= form_tag '/calcular' do %>
+  <%= label_tag :origen %>
+  <%= text_field_tag :origen %>
+  <br/>
+  <%= label_tag :destino %>
+  <%= password_field_tag :destino%>
+  <br/>
+  <%= submit_tag "Calcular" %>
+<% end %>
+
+  <label for="b">Buscar</label>
+     	<input type="text" size="40" name="b" id="b" title="Lugar a buscar" class="text"/>
+	    <div id="mapa"></div>
